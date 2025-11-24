@@ -77,6 +77,7 @@ app.post('/api/data', (req, res) => {
 app.get('/api/visitor-count', (req, res) => {
   try {
     const data = initializeVisitorCount();
+    console.log('방문자 수 조회:', data.count);
     res.json({
       success: true,
       count: data.count, // 누적된 총 방문자 수
@@ -86,7 +87,8 @@ app.get('/api/visitor-count', (req, res) => {
     console.error('방문자 수 조회 오류:', error);
     res.status(500).json({
       success: false,
-      error: '방문자 수를 조회할 수 없습니다.'
+      error: '방문자 수를 조회할 수 없습니다.',
+      details: error.message
     });
   }
 });
@@ -94,7 +96,9 @@ app.get('/api/visitor-count', (req, res) => {
 // 방문자 수 증가 API (누적 형식)
 app.post('/api/visitor-count', (req, res) => {
   try {
+    console.log('방문자 수 증가 요청 받음');
     const data = incrementVisitorCount(); // 누적 증가
+    console.log('방문자 수 증가 완료:', data.count);
     res.json({
       success: true,
       count: data.count, // 누적된 총 방문자 수
@@ -104,7 +108,8 @@ app.post('/api/visitor-count', (req, res) => {
     console.error('방문자 수 증가 오류:', error);
     res.status(500).json({
       success: false,
-      error: '방문자 수를 증가시킬 수 없습니다.'
+      error: '방문자 수를 증가시킬 수 없습니다.',
+      details: error.message
     });
   }
 });
