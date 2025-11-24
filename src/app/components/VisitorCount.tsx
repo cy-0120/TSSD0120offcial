@@ -2,10 +2,6 @@
 
 import React, { useState, useEffect } from 'react'
 import styles from './VisitorCount.module.css'
-import { 
-  hasVisitedToday, 
-  setTodayVisit 
-} from '../utils/cookieUtils'
 
 const API_URL = '/api/visitor-count'
 
@@ -16,39 +12,34 @@ export default function VisitorCount() {
   useEffect(() => {
     const recordAndFetchVisitor = async () => {
       try {
-        // 오늘 방문했는지 확인
-        const visitedToday = hasVisitedToday()
-        console.log('방문자 수 컴포넌트 로드됨')
-        console.log('오늘 방문 여부:', visitedToday)
+        console.log('방문자 수 컴포넌트 로드됨 - 실시간 증가 모드')
         
-        // 오늘 방문하지 않았을 때만 서버에 카운트 증가 요청
-        if (!visitedToday) {
-          try {
-            const incrementResponse = await fetch(API_URL, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              credentials: 'include',
-            })
+        // 먼저 방문자 수 증가 (매번 실행)
+        try {
+          const incrementResponse = await fetch(API_URL, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+          })
 
-            if (incrementResponse.ok) {
-              const incrementData = await incrementResponse.json()
-              console.log('방문자 수 증가 응답:', incrementData)
-              
-              // 오늘 방문 표시 설정
-              if (incrementData.isNewVisit) {
-                setTodayVisit()
-              }
-            } else {
-              console.error('방문자 수 증가 실패:', incrementResponse.status)
+          if (incrementResponse.ok) {
+            const incrementData = await incrementResponse.json()
+            console.log('방문자 수 증가 응답:', incrementData)
+            
+            // 증가된 카운트를 즉시 표시
+            if (incrementData.success) {
+              setTotalVisitorCount(incrementData.count)
             }
-          } catch (incrementError) {
-            console.error('방문자 수 증가 요청 오류:', incrementError)
+          } else {
+            console.error('방문자 수 증가 실패:', incrementResponse.status)
           }
+        } catch (incrementError) {
+          console.error('방문자 수 증가 요청 오류:', incrementError)
         }
 
-        // 현재 총 방문자 수 조회 (항상 실행)
+        // 현재 총 방문자 수 조회 (증가 실패 시 대비)
         const response = await fetch(API_URL)
         
         if (response.ok) {

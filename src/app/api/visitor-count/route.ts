@@ -28,19 +28,15 @@ const initializeVisitorCount = () => {
   }
 }
 
-// 방문자 수 증가 함수 (쿠키 기반 중복 방지)
-const incrementVisitorCount = (hasVisitedToday: boolean) => {
+// 방문자 수 증가 함수 (실시간 증가 - 중복 방지 없음)
+const incrementVisitorCount = () => {
   const data = initializeVisitorCount()
   
-  // 오늘 방문하지 않았을 때만 카운트 증가 (중복 방지)
-  if (!hasVisitedToday) {
-    data.count += 1
-    data.lastUpdated = new Date().toISOString()
-    fs.writeFileSync(VISITOR_COUNT_FILE, JSON.stringify(data, null, 2))
-    console.log('새 방문자 카운트 증가:', data.count)
-  } else {
-    console.log('오늘 이미 방문한 사용자 - 카운트 증가 안 함')
-  }
+  // 매번 방문할 때마다 카운트 증가 (실시간)
+  data.count += 1
+  data.lastUpdated = new Date().toISOString()
+  fs.writeFileSync(VISITOR_COUNT_FILE, JSON.stringify(data, null, 2))
+  console.log('방문자 수 증가:', data.count)
   
   return data
 }
@@ -67,36 +63,18 @@ export async function GET() {
   }
 }
 
-// POST: 방문자 수 증가 (쿠키 기반 중복 방지)
+// POST: 방문자 수 증가 (실시간 증가 - 중복 방지 없음)
 export async function POST(request: NextRequest) {
   try {
-    // 쿠키에서 오늘 방문 여부 확인
-    const lastVisitDate = request.cookies.get('lastVisitDate')?.value
-    const today = new Date().toDateString()
-    const hasVisitedToday = lastVisitDate === today
+    console.log('방문자 수 증가 요청 받음 (실시간 모드)')
     
-    console.log('방문자 수 증가 요청 받음, 오늘 방문 여부:', hasVisitedToday)
+    const data = incrementVisitorCount()
     
-    const data = incrementVisitorCount(hasVisitedToday)
-    
-    // 응답에 쿠키 설정 (오늘 방문 표시)
-    const response = NextResponse.json({
+    return NextResponse.json({
       success: true,
       count: data.count,
-      lastUpdated: data.lastUpdated,
-      isNewVisit: !hasVisitedToday
+      lastUpdated: data.lastUpdated
     })
-    
-    // 오늘 방문 쿠키 설정 (1일 유효)
-    if (!hasVisitedToday) {
-      response.cookies.set('lastVisitDate', today, {
-        expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // 1일
-        path: '/',
-        sameSite: 'lax'
-      })
-    }
-    
-    return response
   } catch (error: any) {
     console.error('방문자 수 증가 오류:', error)
     return NextResponse.json(
