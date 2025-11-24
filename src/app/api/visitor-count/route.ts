@@ -28,12 +28,20 @@ const initializeVisitorCount = () => {
   }
 }
 
-// 방문자 수 증가 함수
-const incrementVisitorCount = () => {
+// 방문자 수 증가 함수 (쿠키 기반 중복 방지)
+const incrementVisitorCount = (hasVisitedToday: boolean) => {
   const data = initializeVisitorCount()
-  data.count += 1
-  data.lastUpdated = new Date().toISOString()
-  fs.writeFileSync(VISITOR_COUNT_FILE, JSON.stringify(data, null, 2))
+  
+  // 오늘 방문하지 않았을 때만 카운트 증가 (중복 방지)
+  if (!hasVisitedToday) {
+    data.count += 1
+    data.lastUpdated = new Date().toISOString()
+    fs.writeFileSync(VISITOR_COUNT_FILE, JSON.stringify(data, null, 2))
+    console.log('새 방문자 카운트 증가:', data.count)
+  } else {
+    console.log('오늘 이미 방문한 사용자 - 카운트 증가 안 함')
+  }
+  
   return data
 }
 
@@ -59,17 +67,36 @@ export async function GET() {
   }
 }
 
-// POST: 방문자 수 증가
-export async function POST() {
+// POST: 방문자 수 증가 (쿠키 기반 중복 방지)
+export async function POST(request: NextRequest) {
   try {
-    console.log('방문자 수 증가 요청 받음')
-    const data = incrementVisitorCount()
-    console.log('방문자 수 증가 완료:', data.count)
-    return NextResponse.json({
+    // 쿠키에서 오늘 방문 여부 확인
+    const lastVisitDate = request.cookies.get('lastVisitDate')?.value
+    const today = new Date().toDateString()
+    const hasVisitedToday = lastVisitDate === today
+    
+    console.log('방문자 수 증가 요청 받음, 오늘 방문 여부:', hasVisitedToday)
+    
+    const data = incrementVisitorCount(hasVisitedToday)
+    
+    // 응답에 쿠키 설정 (오늘 방문 표시)
+    const response = NextResponse.json({
       success: true,
       count: data.count,
-      lastUpdated: data.lastUpdated
+      lastUpdated: data.lastUpdated,
+      isNewVisit: !hasVisitedToday
     })
+    
+    // 오늘 방문 쿠키 설정 (1일 유효)
+    if (!hasVisitedToday) {
+      response.cookies.set('lastVisitDate', today, {
+        expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // 1일
+        path: '/',
+        sameSite: 'lax'
+      })
+    }
+    
+    return response
   } catch (error: any) {
     console.error('방문자 수 증가 오류:', error)
     return NextResponse.json(
