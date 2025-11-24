@@ -3,7 +3,18 @@
 import React, { useState, useEffect } from 'react'
 import styles from './VisitorCount.module.css'
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+// API URL 동적 설정 (Next.js API Routes 사용)
+const getApiUrl = () => {
+  // Next.js API Routes는 같은 도메인에서 실행되므로 상대 경로 사용
+  if (typeof window !== 'undefined') {
+    // 프로덕션/개발 환경 모두 같은 도메인의 API Routes 사용
+    return '/api/visitor-count'
+  }
+  // SSR 시 기본값
+  return '/api/visitor-count'
+}
+
+const API_URL = getApiUrl()
 
 export default function VisitorCount() {
   const [visitorCount, setVisitorCount] = useState<number | null>(null)
