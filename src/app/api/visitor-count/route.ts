@@ -55,15 +55,28 @@ const initializeVisitorCount = () => {
 
 // 방문자 수 증가 함수 (실시간 증가 - 중복 방지 없음)
 const incrementVisitorCount = () => {
-  const data = initializeVisitorCount()
-  
-  // 매번 방문할 때마다 카운트 증가 (실시간)
-  data.count += 1
-  data.lastUpdated = new Date().toISOString()
-  fs.writeFileSync(VISITOR_COUNT_FILE, JSON.stringify(data, null, 2))
-  console.log('방문자 수 증가:', data.count)
-  
-  return data
+  try {
+    const data = initializeVisitorCount()
+    
+    // 매번 방문할 때마다 카운트 증가 (실시간)
+    const oldCount = data.count
+    data.count += 1
+    data.lastUpdated = new Date().toISOString()
+    
+    // 파일 쓰기 시도
+    try {
+      fs.writeFileSync(VISITOR_COUNT_FILE, JSON.stringify(data, null, 2), 'utf8')
+      console.log(`추천 수 증가 성공: ${oldCount} → ${data.count}`)
+    } catch (writeError: any) {
+      console.error('파일 쓰기 오류:', writeError.message)
+      throw writeError
+    }
+    
+    return data
+  } catch (error: any) {
+    console.error('추천 수 증가 함수 오류:', error.message)
+    throw error
+  }
 }
 
 // GET: 방문자 수 조회
@@ -91,9 +104,12 @@ export async function GET() {
 // POST: 방문자 수 증가 (실시간 증가 - 중복 방지 없음)
 export async function POST(request: NextRequest) {
   try {
-    console.log('방문자 수 증가 요청 받음 (실시간 모드)')
+    console.log('추천 수 증가 요청 받음')
+    console.log('파일 경로:', VISITOR_COUNT_FILE)
     
     const data = incrementVisitorCount()
+    
+    console.log('추천 수 증가 완료, 현재 카운트:', data.count)
     
     return NextResponse.json({
       success: true,
@@ -101,11 +117,13 @@ export async function POST(request: NextRequest) {
       lastUpdated: data.lastUpdated
     })
   } catch (error: any) {
-    console.error('방문자 수 증가 오류:', error)
+    console.error('추천 수 증가 오류:', error.message)
+    console.error('스택:', error.stack)
+    
     return NextResponse.json(
       {
         success: false,
-        error: '방문자 수를 증가시킬 수 없습니다.',
+        error: '추천 수를 증가시킬 수 없습니다.',
         details: error.message
       },
       { status: 500 }
