@@ -1,7 +1,7 @@
 import React from 'react'
 import type { Metadata } from 'next'
 import './globals.css'
-import DevToolDetector from './components/DevToolDetector'
+// import DevToolDetector from './components/DevToolDetector' // 비활성화됨
 
 export const metadata: Metadata = {
   title: 'TSSD Official Website',
@@ -16,7 +16,7 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body>
-        <DevToolDetector />
+        {/* <DevToolDetector /> */}
         {children}
       </body>
     </html>
