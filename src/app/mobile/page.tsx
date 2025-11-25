@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import styles from './page.module.css'
+import MetallicCard from '../components/MetallicCard'
 import VisitorCount from '../components/VisitorCount'
 
 export default function MobilePage() {
@@ -121,23 +122,10 @@ export default function MobilePage() {
         )}
       </div>
 
-      {/* 프로필 섹션 */}
-      <section id="profile" className={styles.profileSection}>
-        <div className={styles.profileCard}>
-          <div className={styles.profileImage}>
-            <img 
-              src="/TSSD0120 logo .png" 
-              alt="TSSD0120 Logo" 
-              className={styles.profileLogo}
-            />
-          </div>
-          <h1 className={styles.name}>TSSD0120</h1>
-          <p className={styles.greeting}>안녕하세요</p>
-          <p className={styles.intro}>
-            프론트엔드와 보안에 관심이 많은 개발자입니다.
-          </p>
-        </div>
-      </section>
+      {/* 3D 금속 명함 - 중앙 (PC와 동일) */}
+      <div id="profile">
+        <MetallicCard />
+      </div>
 
       <div className={styles.content}>
         {/* About Me 섹션 */}

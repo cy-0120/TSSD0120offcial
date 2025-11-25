@@ -2,28 +2,53 @@ import { NextRequest, NextResponse } from 'next/server'
 import fs from 'fs'
 import path from 'path'
 
-const VISITOR_COUNT_FILE = path.join(process.cwd(), 'server', 'visitor-count.json')
+// 프로덕션 환경에서는 .next 폴더에 저장, 개발 환경에서는 server 폴더에 저장
+const getVisitorCountFilePath = () => {
+  const isProduction = process.env.NODE_ENV === 'production'
+  if (isProduction) {
+    // 프로덕션: 프로젝트 루트에 저장
+    return path.join(process.cwd(), 'visitor-count.json')
+  }
+  // 개발: server 폴더에 저장
+  return path.join(process.cwd(), 'server', 'visitor-count.json')
+}
+
+const VISITOR_COUNT_FILE = getVisitorCountFilePath()
 
 // 방문자 수 초기화 함수
 const initializeVisitorCount = () => {
-  if (!fs.existsSync(VISITOR_COUNT_FILE)) {
-    const initialData = {
-      count: 0,
-      lastUpdated: new Date().toISOString()
-    }
-    fs.writeFileSync(VISITOR_COUNT_FILE, JSON.stringify(initialData, null, 2))
-    return initialData
-  }
   try {
+    // 디렉토리가 없으면 생성
+    const dir = path.dirname(VISITOR_COUNT_FILE)
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true })
+    }
+
+    if (!fs.existsSync(VISITOR_COUNT_FILE)) {
+      const initialData = {
+        count: 0,
+        lastUpdated: new Date().toISOString()
+      }
+      fs.writeFileSync(VISITOR_COUNT_FILE, JSON.stringify(initialData, null, 2), 'utf8')
+      console.log('방문자 수 파일 생성:', VISITOR_COUNT_FILE)
+      return initialData
+    }
+    
     const data = fs.readFileSync(VISITOR_COUNT_FILE, 'utf8')
-    return JSON.parse(data)
-  } catch (error) {
-    console.error('방문자 수 파일 읽기 오류:', error)
+    const parsed = JSON.parse(data)
+    console.log('방문자 수 파일 읽기 성공:', parsed.count)
+    return parsed
+  } catch (error: any) {
+    console.error('방문자 수 파일 읽기 오류:', error.message)
     const initialData = {
       count: 0,
       lastUpdated: new Date().toISOString()
     }
-    fs.writeFileSync(VISITOR_COUNT_FILE, JSON.stringify(initialData, null, 2))
+    try {
+      fs.writeFileSync(VISITOR_COUNT_FILE, JSON.stringify(initialData, null, 2), 'utf8')
+    } catch (writeError: any) {
+      console.error('방문자 수 파일 쓰기 오류:', writeError.message)
+    }
     return initialData
   }
 }
