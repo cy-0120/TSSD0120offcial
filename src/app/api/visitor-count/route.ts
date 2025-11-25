@@ -2,55 +2,53 @@ import { NextRequest, NextResponse } from 'next/server'
 import fs from 'fs'
 import path from 'path'
 
-// 프로덕션 환경에서는 .next 폴더에 저장, 개발 환경에서는 server 폴더에 저장
+// 메모리 기반 저장소 (서버리스 환경 대응)
+let memoryStore: {
+  count: number
+  lastUpdated: string
+} | null = null
+
+// 파일 시스템 저장소 (개발 환경용)
 const getVisitorCountFilePath = () => {
   const isProduction = process.env.NODE_ENV === 'production'
   if (isProduction) {
-    // 프로덕션: 프로젝트 루트에 저장
     return path.join(process.cwd(), 'visitor-count.json')
   }
-  // 개발: server 폴더에 저장
   return path.join(process.cwd(), 'server', 'visitor-count.json')
 }
 
 const VISITOR_COUNT_FILE = getVisitorCountFilePath()
 
-// 방문자 수 초기화 함수
+// 방문자 수 초기화 함수 (파일 시스템 시도, 실패 시 메모리 사용)
 const initializeVisitorCount = () => {
-  try {
-    // 디렉토리가 없으면 생성
-    const dir = path.dirname(VISITOR_COUNT_FILE)
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true })
-    }
+  // 먼저 메모리에 값이 있으면 반환
+  if (memoryStore) {
+    return memoryStore
+  }
 
-    if (!fs.existsSync(VISITOR_COUNT_FILE)) {
-      const initialData = {
-        count: 0,
-        lastUpdated: new Date().toISOString()
-      }
-      fs.writeFileSync(VISITOR_COUNT_FILE, JSON.stringify(initialData, null, 2), 'utf8')
-      console.log('방문자 수 파일 생성:', VISITOR_COUNT_FILE)
-      return initialData
+  // 파일 시스템 시도 (개발 환경 또는 파일 쓰기 가능한 경우)
+  try {
+    if (fs.existsSync(VISITOR_COUNT_FILE)) {
+      const data = fs.readFileSync(VISITOR_COUNT_FILE, 'utf8')
+      const parsed = JSON.parse(data)
+      memoryStore = parsed // 메모리에 캐시
+      console.log('파일에서 추천 수 읽기 성공:', parsed.count)
+      return parsed
     }
-    
-    const data = fs.readFileSync(VISITOR_COUNT_FILE, 'utf8')
-    const parsed = JSON.parse(data)
-    console.log('방문자 수 파일 읽기 성공:', parsed.count)
-    return parsed
   } catch (error: any) {
-    console.error('방문자 수 파일 읽기 오류:', error.message)
-    const initialData = {
+    // 파일 읽기 실패 시 메모리 사용 (서버리스 환경)
+    console.log('파일 시스템 사용 불가, 메모리 저장소 사용:', error.message)
+  }
+
+  // 메모리 저장소 초기화
+  if (!memoryStore) {
+    memoryStore = {
       count: 0,
       lastUpdated: new Date().toISOString()
     }
-    try {
-      fs.writeFileSync(VISITOR_COUNT_FILE, JSON.stringify(initialData, null, 2), 'utf8')
-    } catch (writeError: any) {
-      console.error('방문자 수 파일 쓰기 오류:', writeError.message)
-    }
-    return initialData
   }
+
+  return memoryStore
 }
 
 // 방문자 수 증가 함수 (실시간 증가 - 중복 방지 없음)
@@ -63,13 +61,21 @@ const incrementVisitorCount = () => {
     data.count += 1
     data.lastUpdated = new Date().toISOString()
     
-    // 파일 쓰기 시도
+    // 메모리 저장소 업데이트
+    memoryStore = data
+    
+    // 파일 쓰기 시도 (가능한 경우에만)
     try {
+      // 디렉토리가 없으면 생성 시도
+      const dir = path.dirname(VISITOR_COUNT_FILE)
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true })
+      }
       fs.writeFileSync(VISITOR_COUNT_FILE, JSON.stringify(data, null, 2), 'utf8')
-      console.log(`추천 수 증가 성공: ${oldCount} → ${data.count}`)
+      console.log(`추천 수 증가 성공 (파일 저장): ${oldCount} → ${data.count}`)
     } catch (writeError: any) {
-      console.error('파일 쓰기 오류:', writeError.message)
-      throw writeError
+      // 파일 쓰기 실패해도 메모리에는 저장됨 (서버리스 환경)
+      console.log(`추천 수 증가 성공 (메모리 저장): ${oldCount} → ${data.count} (파일 쓰기 실패: ${writeError.message})`)
     }
     
     return data

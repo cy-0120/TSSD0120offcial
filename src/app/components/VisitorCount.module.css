@@ -111,6 +111,16 @@
   filter: drop-shadow(0 0 10px rgba(102, 126, 234, 0.8));
 }
 
+.limitReached {
+  font-size: 0.7rem;
+  color: #ff6b6b;
+  margin-left: 0.5rem;
+  text-shadow: 
+    0 0 10px rgba(255, 107, 107, 0.8),
+    0 0 20px rgba(255, 107, 107, 0.5);
+  opacity: 0.8;
+}
+
 @keyframes textShine {
   0%, 100% {
     background-position: 0% 50%;

@@ -88,3 +88,34 @@ export const setTodayVisit = (): void => {
   setCookie('lastVisitDate', today, 1) // 1일 유효
 }
 
+/**
+ * 추천 클릭 횟수 가져오기
+ * @returns 추천 클릭 횟수 (최대 5)
+ */
+export const getRecommendClickCount = (): number => {
+  const clickCount = getCookie('recommendClickCount')
+  if (clickCount) {
+    return parseInt(clickCount, 10) || 0
+  }
+  return 0
+}
+
+/**
+ * 추천 클릭 횟수 증가
+ * @returns 증가된 클릭 횟수
+ */
+export const incrementRecommendClickCount = (): number => {
+  let clickCount = getRecommendClickCount()
+  clickCount++
+  setCookie('recommendClickCount', clickCount.toString(), 90) // 90일 유효
+  return clickCount
+}
+
+/**
+ * 추천 클릭 가능 여부 확인
+ * @returns 5번 미만이면 true
+ */
+export const canRecommend = (): boolean => {
+  return getRecommendClickCount() < 5
+}
+
