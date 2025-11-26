@@ -11,8 +11,12 @@ export default function VisitorCount() {
 
   // 초기 로드 시 방문자 수 자동 증가
   useEffect(() => {
+    let isMounted = true
+    
     const incrementAndFetch = async () => {
       try {
+        console.log('[클라이언트] 방문자 수 증가 요청 시작')
+        
         // 방문자 수 자동 증가
         const incrementResponse = await fetch(API_URL, {
           method: 'POST',
@@ -22,66 +26,81 @@ export default function VisitorCount() {
           credentials: 'include',
         })
 
+        console.log('[클라이언트] 응답 상태:', incrementResponse.status)
+
         if (incrementResponse.ok) {
           const incrementData = await incrementResponse.json()
+          console.log('[클라이언트] 응답 데이터:', incrementData)
+          
           if (incrementData.success) {
-            setVisitorCount(incrementData.count)
-            console.log('방문자 수 증가 성공:', incrementData.count)
+            if (isMounted) {
+              setVisitorCount(incrementData.count)
+              console.log('[클라이언트] 방문자 수 증가 성공:', incrementData.count)
+            }
           } else {
-            console.error('방문자 수 증가 실패:', incrementData.error)
+            console.error('[클라이언트] 방문자 수 증가 실패:', incrementData.error)
             // 증가 실패 시 조회만 시도
             const response = await fetch(API_URL)
             if (response.ok) {
               const data = await response.json()
-              if (data.success) {
+              if (data.success && isMounted) {
                 setVisitorCount(data.count)
-              } else {
+              } else if (isMounted) {
                 setVisitorCount(0)
               }
-            } else {
+            } else if (isMounted) {
               setVisitorCount(0)
             }
           }
         } else {
-          console.error('방문자 수 증가 HTTP 오류:', incrementResponse.status)
+          const errorText = await incrementResponse.text()
+          console.error('[클라이언트] 방문자 수 증가 HTTP 오류:', incrementResponse.status, errorText)
           // 증가 실패 시 조회만 시도
           const response = await fetch(API_URL)
           if (response.ok) {
             const data = await response.json()
-            if (data.success) {
+            if (data.success && isMounted) {
               setVisitorCount(data.count)
-            } else {
+            } else if (isMounted) {
               setVisitorCount(0)
             }
-          } else {
+          } else if (isMounted) {
             setVisitorCount(0)
           }
         }
-      } catch (error) {
-        console.error('방문자 수 증가 오류:', error)
+      } catch (error: any) {
+        console.error('[클라이언트] 방문자 수 증가 오류:', error.message)
         // 오류 발생 시 조회만 시도
         try {
           const response = await fetch(API_URL)
           if (response.ok) {
             const data = await response.json()
-            if (data.success) {
+            if (data.success && isMounted) {
               setVisitorCount(data.count)
-            } else {
+            } else if (isMounted) {
               setVisitorCount(0)
             }
-          } else {
+          } else if (isMounted) {
             setVisitorCount(0)
           }
         } catch (fetchError) {
-          console.error('방문자 수 조회 오류:', fetchError)
-          setVisitorCount(0)
+          console.error('[클라이언트] 방문자 수 조회 오류:', fetchError)
+          if (isMounted) {
+            setVisitorCount(0)
+          }
         }
       } finally {
-        setIsLoading(false)
+        if (isMounted) {
+          setIsLoading(false)
+        }
       }
     }
 
     incrementAndFetch()
+    
+    return () => {
+      isMounted = false
+    }
   }, [])
 
   return (

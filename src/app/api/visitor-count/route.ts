@@ -77,25 +77,41 @@ const incrementVisitorCount = () => {
   try {
     // 항상 파일에서 최신 값 읽기 (메모리 캐시 무시)
     let data
+    let oldCount = 0
+    
     try {
       if (fs.existsSync(VISITOR_COUNT_FILE)) {
         const fileData = fs.readFileSync(VISITOR_COUNT_FILE, 'utf8')
         data = JSON.parse(fileData)
-        console.log('파일에서 최신 방문자 수 읽기:', data.count)
+        oldCount = data.count || 0
+        console.log(`[증가 전] 파일에서 최신 방문자 수 읽기: ${oldCount}`)
+        
+        // 데이터 유효성 검사
+        if (typeof data.count !== 'number') {
+          console.warn('방문자 수가 숫자가 아님, 0으로 초기화')
+          data.count = 0
+          oldCount = 0
+        }
       } else {
         // 파일이 없으면 초기화
+        console.log('파일이 없음, 초기화')
         data = initializeVisitorCount()
+        oldCount = data.count || 0
       }
     } catch (readError: any) {
       // 파일 읽기 실패 시 메모리 또는 초기화
+      console.error('파일 읽기 실패:', readError.message)
       data = memoryStore || initializeVisitorCount()
-      console.log('파일 읽기 실패, 메모리 값 사용:', data.count)
+      oldCount = data.count || 0
+      console.log(`파일 읽기 실패, 메모리 값 사용: ${oldCount}`)
     }
     
     // 방문자 수 증가
-    const oldCount = data.count
-    data.count += 1
+    const newCount = (oldCount || 0) + 1
+    data.count = newCount
     data.lastUpdated = new Date().toISOString()
+    
+    console.log(`[증가] ${oldCount} → ${newCount}`)
     
     // 메모리 저장소 업데이트 (캐시)
     memoryStore = data
@@ -106,17 +122,27 @@ const incrementVisitorCount = () => {
       if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir, { recursive: true })
       }
-      fs.writeFileSync(VISITOR_COUNT_FILE, JSON.stringify(data, null, 2), 'utf8')
-      console.log(`방문자 수 증가 성공 (파일 저장): ${oldCount} → ${data.count}`)
+      const jsonData = JSON.stringify(data, null, 2)
+      fs.writeFileSync(VISITOR_COUNT_FILE, jsonData, 'utf8')
+      
+      // 저장 후 검증
+      const verifyData = fs.readFileSync(VISITOR_COUNT_FILE, 'utf8')
+      const verified = JSON.parse(verifyData)
+      console.log(`[저장 완료] 파일에 저장된 값: ${verified.count} (예상: ${newCount})`)
+      
+      if (verified.count !== newCount) {
+        console.error(`[오류] 저장된 값이 예상과 다름! 예상: ${newCount}, 실제: ${verified.count}`)
+      }
     } catch (writeError: any) {
       // 파일 쓰기 실패 시 경고 (하지만 메모리에는 저장됨)
-      console.warn(`방문자 수 증가 (메모리만 저장): ${oldCount} → ${data.count} (파일 쓰기 실패: ${writeError.message})`)
+      console.error(`[파일 쓰기 실패] ${oldCount} → ${newCount} (오류: ${writeError.message})`)
       // 서버리스 환경에서는 파일 쓰기가 실패할 수 있지만, 메모리에는 저장됨
     }
     
     return data
   } catch (error: any) {
     console.error('방문자 수 증가 함수 오류:', error.message)
+    console.error('스택:', error.stack)
     throw error
   }
 }
