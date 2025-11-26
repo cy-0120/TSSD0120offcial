@@ -119,23 +119,40 @@ const incrementVisitorCount = () => {
     // 항상 파일에 저장 시도 (지속성 보장)
     try {
       const dir = path.dirname(VISITOR_COUNT_FILE)
+      console.log(`[저장 시도] 디렉토리: ${dir}`)
+      
       if (!fs.existsSync(dir)) {
+        console.log(`[저장 시도] 디렉토리 생성: ${dir}`)
         fs.mkdirSync(dir, { recursive: true })
       }
-      const jsonData = JSON.stringify(data, null, 2)
-      fs.writeFileSync(VISITOR_COUNT_FILE, jsonData, 'utf8')
       
-      // 저장 후 검증
+      const jsonData = JSON.stringify(data, null, 2)
+      console.log(`[저장 시도] 저장할 데이터: ${jsonData}`)
+      
+      // 파일 쓰기
+      fs.writeFileSync(VISITOR_COUNT_FILE, jsonData, 'utf8')
+      console.log(`[저장 성공] 파일 경로: ${VISITOR_COUNT_FILE}`)
+      
+      // 저장 후 즉시 검증
       const verifyData = fs.readFileSync(VISITOR_COUNT_FILE, 'utf8')
       const verified = JSON.parse(verifyData)
-      console.log(`[저장 완료] 파일에 저장된 값: ${verified.count} (예상: ${newCount})`)
+      console.log(`[검증] 파일에 저장된 값: ${verified.count} (예상: ${newCount})`)
       
       if (verified.count !== newCount) {
         console.error(`[오류] 저장된 값이 예상과 다름! 예상: ${newCount}, 실제: ${verified.count}`)
+        // 다시 시도
+        fs.writeFileSync(VISITOR_COUNT_FILE, jsonData, 'utf8')
+        const retryVerify = JSON.parse(fs.readFileSync(VISITOR_COUNT_FILE, 'utf8'))
+        console.log(`[재시도 검증] 저장된 값: ${retryVerify.count}`)
+      } else {
+        console.log(`[저장 완료] 성공적으로 저장됨: ${newCount}`)
       }
     } catch (writeError: any) {
       // 파일 쓰기 실패 시 경고 (하지만 메모리에는 저장됨)
-      console.error(`[파일 쓰기 실패] ${oldCount} → ${newCount} (오류: ${writeError.message})`)
+      console.error(`[파일 쓰기 실패] ${oldCount} → ${newCount}`)
+      console.error(`[파일 쓰기 실패] 오류 메시지: ${writeError.message}`)
+      console.error(`[파일 쓰기 실패] 오류 코드: ${writeError.code}`)
+      console.error(`[파일 쓰기 실패] 스택: ${writeError.stack}`)
       // 서버리스 환경에서는 파일 쓰기가 실패할 수 있지만, 메모리에는 저장됨
     }
     
@@ -190,12 +207,28 @@ export async function GET() {
 // POST: 방문자 수 증가
 export async function POST(request: NextRequest) {
   try {
-    console.log('방문자 수 증가 요청 받음')
+    console.log('=== 방문자 수 증가 요청 시작 ===')
     console.log('파일 경로:', VISITOR_COUNT_FILE)
+    console.log('파일 존재 여부:', fs.existsSync(VISITOR_COUNT_FILE))
+    console.log('현재 작업 디렉토리:', process.cwd())
+    console.log('NODE_ENV:', process.env.NODE_ENV)
     
     const data = incrementVisitorCount()
     
-    console.log('방문자 수 증가 완료, 현재 카운트:', data.count)
+    console.log('=== 방문자 수 증가 완료 ===')
+    console.log('최종 카운트:', data.count)
+    console.log('마지막 업데이트:', data.lastUpdated)
+    
+    // 파일 다시 읽어서 확인
+    try {
+      if (fs.existsSync(VISITOR_COUNT_FILE)) {
+        const verifyData = fs.readFileSync(VISITOR_COUNT_FILE, 'utf8')
+        const verified = JSON.parse(verifyData)
+        console.log('파일 재확인 - 저장된 값:', verified.count)
+      }
+    } catch (verifyError: any) {
+      console.error('파일 재확인 실패:', verifyError.message)
+    }
     
     return NextResponse.json({
       success: true,
