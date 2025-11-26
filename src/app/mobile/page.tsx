@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react'
 import styles from './page.module.css'
 import MetallicCard from '../components/MetallicCard'
-import VisitorCount from '../components/VisitorCount'
 
 export default function MobilePage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -277,9 +276,6 @@ export default function MobilePage() {
           </div>
         </section>
       </div>
-
-      {/* 방문자 수 표시 */}
-      <VisitorCount />
     </div>
   )
 }
