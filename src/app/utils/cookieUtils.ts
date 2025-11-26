@@ -119,3 +119,19 @@ export const canRecommend = (): boolean => {
   return getRecommendClickCount() < 5
 }
 
+/**
+ * 추천 클릭 횟수 초기화
+ */
+export const resetRecommendClickCount = (): void => {
+  deleteCookie('recommendClickCount')
+}
+
+/**
+ * 모든 추천 관련 쿠키 초기화
+ */
+export const resetAllRecommendCookies = (): void => {
+  deleteCookie('recommendClickCount')
+  deleteCookie('pageHit')
+  deleteCookie('lastVisitDate')
+}
+

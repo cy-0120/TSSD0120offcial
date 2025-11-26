@@ -3,10 +3,20 @@ import fs from 'fs'
 import path from 'path'
 
 // 메모리 기반 저장소 (서버리스 환경 대응)
-let memoryStore: {
+// 주의: 서버리스 환경에서는 각 인스턴스가 독립적이므로 메모리 저장소가 공유되지 않을 수 있습니다.
+// 파일 시스템을 통한 동기화가 필요합니다.
+export let memoryStore: {
   count: number
   lastUpdated: string
 } | null = null
+
+// 메모리 저장소 초기화 함수 (외부에서 호출 가능)
+export const resetMemoryStore = () => {
+  memoryStore = {
+    count: 0,
+    lastUpdated: new Date().toISOString()
+  }
+}
 
 // 파일 시스템 저장소 (개발 환경용)
 const getVisitorCountFilePath = () => {
