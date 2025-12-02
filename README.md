@@ -13,7 +13,6 @@
 ```
 .
 ├── app/                    # Next.js App Router
-│   ├── api/               # API Routes
 │   ├── main/              # Main 페이지
 │   ├── layout.tsx         # 루트 레이아웃
 │   ├── page.tsx           # 홈 페이지
@@ -36,11 +35,7 @@ npm install
 
 ### 2. 환경 변수 설정
 
-`.env.example` 파일을 참고하여 `.env` 파일을 생성하세요.
-
-```bash
-cp .env.example .env
-```
+필요한 경우 `.env` 파일을 생성하여 환경 변수를 설정하세요.
 
 ### 3. 개발 서버 실행
 
@@ -65,31 +60,27 @@ npm start
 
 - ✅ Next.js App Router 기반 라우팅
 - ✅ TypeScript 지원
-- ✅ API Routes (Next.js)
 - ✅ Express 서버 (Node.js)
 - ✅ CSS Modules 스타일링
 
 ## API 엔드포인트
 
-### Next.js API Routes
-- `GET /api/hello` - Hello API
-
 ### Express 서버
 - `GET /` - 서버 상태 확인
 - `GET /api/health` - 헬스 체크
 - `POST /api/data` - 데이터 수신
+- `GET /api/visitor-count` - 방문자 수 조회
+- `POST /api/visitor-count` - 방문자 수 증가
 
 ## 개발 가이드
 
 ### 새 페이지 추가  
 `app/` 디렉토리에 새 폴더를 만들고 `page.tsx` 파일을 생성하세요.
 
-### API 라우트 추가
-`app/api/` 디렉토리에 새 폴더를 만들고 `route.ts` 파일을 생성하세요.
 
 ## 라이선스
 
 MIT
 
-# TSSD0120offcial
-# TSSD0120offcial
+# Rupital0815offcial
+# Rupital0815offcial

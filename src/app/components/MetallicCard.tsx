@@ -5,7 +5,7 @@ import styles from './MetallicCard.module.css'
 
 export default function MetallicCard() {
   const [copied, setCopied] = useState(false)
-  const [emailLink, setEmailLink] = useState('mailto:tssd0120public@gmail.com')
+  const [emailLink, setEmailLink] = useState('mailto:rupital0815@gmail.com')
   const [isMobile, setIsMobile] = useState(false)
 
   useEffect(() => {
@@ -16,7 +16,7 @@ export default function MetallicCard() {
       
       setIsMobile(isMobileDevice)
       
-      const emailAddress = 'tssd0120public@gmail.com'
+      const emailAddress = 'rupital0815@gmail.com'
       
       if (isMobileDevice) {
         // 모바일: mailto 사용
@@ -92,7 +92,7 @@ export default function MetallicCard() {
       <div className={styles.card3D}>
         <div className={styles.cardFront}>
           <div className={styles.cardContent}>
-            <div className={styles.logo}>TSSD0120</div>
+            <div className={styles.logo}>Rupital0815</div>
             <div className={styles.title}>Student</div>
             <div className={styles.developmentText}>Development begins in 2024</div>
             <div className={styles.divider}></div>
@@ -106,17 +106,17 @@ export default function MetallicCard() {
                   target={!isMobile ? '_blank' : undefined}
                   rel={!isMobile ? 'noopener noreferrer' : undefined}
                 >
-                  tssd0120public@gmail.com
+                  rupital0815@gmail.com
                 </a>
               </div>
               <div className={styles.infoItem}>
                 <span className={styles.infoLabel}>Discord:</span>
                 <span 
                   className={styles.infoValue}
-                  onClick={() => handleCopy('tssd0120')}
+                  onClick={() => handleCopy('rupital0815')}
                   style={{ cursor: 'pointer' }}
                 >
-                  tssd0120
+                  rupital0815
                 </span>
                 {copied && (
                   <span className={styles.copiedMessage}>copied(복사됨)</span>

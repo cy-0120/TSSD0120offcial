@@ -16,11 +16,13 @@ export default function DevToolDetector() {
     document.head.appendChild(script2)
 
     return () => {
-      if (document.head.contains(script1)) {
-        document.head.removeChild(script1)
-      }
-      if (document.head.contains(script2)) {
-        document.head.removeChild(script2)
+      if (typeof document !== 'undefined' && document.head) {
+        if (script1 && script1.parentNode) {
+          script1.remove()
+        }
+        if (script2 && script2.parentNode) {
+          script2.remove()
+        }
       }
     }
   }, [])

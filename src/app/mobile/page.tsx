@@ -121,7 +121,7 @@ export default function MobilePage() {
         )}
       </div>
 
-      {/* 3D 금속 명함 - 중앙 (PC와 동일) */}
+      {/* 3D명함 */}
       <div id="profile">
         <MetallicCard />
       </div>
@@ -132,7 +132,7 @@ export default function MobilePage() {
           <div className={styles.aboutCard}>
             <h2 className={styles.sectionTitle}>About Me</h2>
             <p className={styles.description}>
-              안녕하세요! 저는 TSSD0120입니다.
+              안녕하세요! 저는 Rupital0815입니다.
               <br />
               프론트엔드와 보안 전문가를 목표를 하고 있습니다.
               <br />
@@ -174,7 +174,7 @@ export default function MobilePage() {
                 </div>
               </div>
               <p className={styles.projectDescription}>
-                TSSD0120의 공식 사이트 입니다.
+                Rupital0815의 공식 사이트 입니다.
               </p>
               <div className={styles.projectTech}>
                 <span className={styles.techTag}>Next.js</span>

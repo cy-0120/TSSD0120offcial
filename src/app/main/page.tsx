@@ -6,7 +6,6 @@ import MetallicCard from '../components/MetallicCard'
 
 export default function MainPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [visibleSection, setVisibleSection] = useState<string | null>(null)
 
   // 초기 로드 시 자동 스크롤 방지
   useEffect(() => {
@@ -141,12 +140,12 @@ export default function MainPage() {
           <div className={styles.aboutCard}>
             <div className={styles.profileImage}>
               <img 
-                src="/TSSD0120 logo .png" 
-                alt="TSSD0120 Logo" 
+                src="/Rupital.jpg" 
+                alt="Rupital0815 Logo" 
                 className={styles.profileLogo}
               />
             </div>
-            <h1 className={styles.name}>TSSD0120</h1>
+            <h1 className={styles.name}>Rupital0815</h1>
             <p className={styles.greeting}>안녕하세요</p>
             <p className={styles.intro}>
               프론트엔드와 보안에 관심이 많은 개발자입니다.
@@ -154,7 +153,7 @@ export default function MainPage() {
             
             <h2 className={styles.sectionTitle}>About Me</h2>
             <p className={styles.description}>
-              안녕하세요! 저는 TSSD0120입니다.
+              안녕하세요! 저는 Rupital0815입니다.
               <br />
               프론트엔드와 보안 전문가를 목표를 하고 있습니다.
               <br />
@@ -196,7 +195,7 @@ export default function MainPage() {
                 </div>
               </div>
               <p className={styles.projectDescription}>
-                TSSD0120의 공식 사이트 입니다.
+                Rupital0815의 공식 사이트 입니다.
               </p>
               <div className={styles.projectTech}>
                 <span className={styles.techTag}>Next.js</span>
