@@ -182,7 +182,7 @@ export default function MainPage() {
           <div className={styles.projectsGrid}>
             <div className={styles.projectCard}>
               <div className={styles.projectHeader}>
-                <h3 className={styles.projectTitle}>TSSD Official Web</h3>
+                <h3 className={styles.projectTitle}>Rupital Official Web</h3>
                 <div className={styles.statusContainer}>
                   <span className={styles.projectStatus}>활성</span>
                   <span className={styles.completionLabel}>완성도</span>
@@ -241,7 +241,7 @@ export default function MainPage() {
               <div className={styles.projectHeader}>
                 <h3 className={styles.projectTitle}>genshin illust</h3>
                 <div className={styles.statusContainer}>
-                  <span className={styles.projectStatus}>활성</span>
+                  <span className={`${styles.projectStatus} ${styles.projectStatusInactive}`}>비활성</span>
                   <span className={styles.completionLabel}>완성도</span>
                   <div className={styles.activityBar}>
                     <div 
@@ -254,6 +254,9 @@ export default function MainPage() {
               <p className={styles.projectDescription}>
                 원신의 일러스트래이트 관련 홈페이지 입니다.
               </p>
+              <div className={styles.projectReason}>
+                <span className={styles.reasonLabel}>비활성 사유:최적화 문재로 인한 일시 비활성</span>
+              </div>
               <div className={styles.projectTech}>
                 <span className={styles.techTag}>HTML</span>
                 <span className={styles.techTag}>CSS</span>
