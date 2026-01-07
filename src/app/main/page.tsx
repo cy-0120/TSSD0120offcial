@@ -161,7 +161,7 @@ export default function MainPage() {
             </p>
             <div className={styles.stats}>
               <div className={styles.statItem}>
-                <div className={styles.statNumber}>18세</div>
+                <div className={styles.statNumber}>19세</div>
                 <div className={styles.statLabel}>고등학생</div>
               </div>
               <div className={styles.statItem}>
@@ -169,7 +169,7 @@ export default function MainPage() {
                 <div className={styles.statLabel}>직업</div>
               </div>
               <div className={styles.statItem}>
-                <div className={styles.statNumber}>1년</div>
+                <div className={styles.statNumber}>2년</div>
                 <div className={styles.statLabel}>개발 경험</div>
               </div>
             </div>

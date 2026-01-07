@@ -123,12 +123,24 @@
   color: #667eea;
 }
 
+/* 프로필 섹션 (명함) - 모바일에서 전체 화면 */
+#profile {
+  width: 100%;
+  min-height: 100vh;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+}
+
 .content {
   width: 100%;
   max-width: 100%;
   margin: 0;
   padding: 0.5rem;
-  padding-top: 5rem;
+  padding-top: 2rem;
   display: block;
   position: relative;
   z-index: 2;
