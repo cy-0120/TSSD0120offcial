@@ -6,6 +6,9 @@ import MetallicCard from '../components/MetallicCard'
 
 export default function MainPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [contentRevealed, setContentRevealed] = useState(false)
+  const [tapCount, setTapCount] = useState(0)
+  const [interactionSignal, setInteractionSignal] = useState(0)
 
   // 초기 로드 시 자동 스크롤 방지
   useEffect(() => {
@@ -50,11 +53,49 @@ export default function MainPage() {
     setIsMenuOpen(false)
   }
 
+  const [isFading, setIsFading] = useState(false)
+  const handleScreenClick = (e: React.MouseEvent<HTMLElement>) => {
+    if (contentRevealed || isFading) return  // ← isFading 조건 추가
+    const target = e.target as HTMLElement
+    if (target.closest('a, button')) return
+  
+    setInteractionSignal((prev) => prev + 1)
+  
+    setTapCount((prev) => {
+      const next = prev + 1
+      if (next >= 2) {
+        setIsFading(true)
+        setTimeout(() => {
+          setIsFading(false)
+          setContentRevealed(true)
+          setTimeout(() => {
+            const el = document.getElementById('about')
+            if (el) el.scrollIntoView({ behavior: 'smooth' })
+          }, 50)
+        }, 600)  
+        return 0
+      }
+      return next
+    })
+  }
+  
+  // handleBackToCard 수정
+  const handleBackToCard = () => {
+    setContentRevealed(false)
+    setIsFading(false)
+    setTapCount(0)
+    setIsMenuOpen(false)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
   const handleMenuClick = (e: React.MouseEvent<HTMLAnchorElement>, targetId: string) => {
     e.preventDefault()
     closeMenu()
+
+    if (!contentRevealed && targetId !== 'profile') {
+      setContentRevealed(true)
+    }
     
-    // 모든 섹션이 항상 표시되므로 스크롤만 실행
     setTimeout(() => {
       const element = document.getElementById(targetId)
       if (element) {
@@ -77,8 +118,9 @@ export default function MainPage() {
   }
 
   return (
-    <div className={styles.mainContainer}>
+    <div className={`${styles.mainContainer} ${!contentRevealed ? styles.cardOnlyMode : ''}`}>
       {/* 햄버거 메뉴 */}
+      {contentRevealed && (
       <div className={styles.menuContainer}>
         <button 
           className={styles.menuButton}
@@ -128,13 +170,26 @@ export default function MainPage() {
           </>
         )}
       </div>
+      )}
 
-      {/* 3D 금속 명함 - 중앙 */}
-      <div id="profile">
-        <MetallicCard />
-      </div>
+      {/* 3D 금속 명함  */}
+      {!contentRevealed && (
+        <div
+          id="profile"
+          className={`${styles.profileSection} ${isFading ? styles.profileSectionFading : styles.profileSectionCardOnly}`}
+          onClick={handleScreenClick}
+        >
+          <MetallicCard enableGyro interactionSignal={interactionSignal} />
+          {!isFading && (
+            <p className={styles.tapHint}>
+              {tapCount === 0 ? '화면을 두 번 클릭하면 더 많은 정보를 볼 수 있어요' : '한 번 더 클릭하세요'}
+            </p>
+          )}
+        </div>
+      )}
 
-      <div className={styles.content}>
+      {contentRevealed && (
+      <div className={`${styles.content} ${styles.contentVisible}`}>
         {/* About Me 섹션 - 명함 스타일 */}
         <section id="about" className={styles.aboutSection}>
           <div className={styles.aboutCard}>
@@ -220,8 +275,8 @@ export default function MainPage() {
                   <span className={styles.completionLabel}>완성도</span>
                   <div className={styles.activityBar}>
                     <div 
-                      className={`${styles.activityFill} ${getCompletionColorClass(65)}`} 
-                      style={{ width: '65%' }}
+                      className={`${styles.activityFill} ${getCompletionColorClass(100)}`} 
+                      style={{ width: '100%' }}
                     ></div>
                   </div>
                 </div>
@@ -264,6 +319,35 @@ export default function MainPage() {
                 <span className={styles.techTag}>F12 감지 툴</span>
               </div>
             </div>
+            <div className={styles.projectCard}>
+              <div className={styles.projectHeader}>
+                <a 
+                  href="https://www.goodbye-boj.com/" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className={styles.projectTitleLink}
+                >
+                  <h3 className={styles.projectTitle}>Welcome Back! BOJ!</h3>
+                </a>
+                <div className={styles.statusContainer}>
+                  <span className={styles.projectStatus}>활성</span>
+                  <span className={styles.completionLabel}>완성도</span>
+                  <div className={styles.activityBar}>
+                    <div 
+                      className={`${styles.activityFill} ${getCompletionColorClass(100)}`} 
+                      style={{ width: '100%' }}
+                    ></div>
+                  </div>
+                </div>
+              </div>
+              <p className={styles.projectDescription}>
+                백준을 기억하기 위해 만든 사이트 입니다.
+              </p>
+              <div className={styles.projectTech}>
+                <span className={styles.techTag}>React</span>
+                <span className={styles.techTag}>Node.js</span>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -300,6 +384,18 @@ export default function MainPage() {
           </div>
         </section>
       </div>
+      )}
+
+      {contentRevealed && (
+        <button
+          type="button"
+          className={styles.backToCardButton}
+          onClick={handleBackToCard}
+          aria-label="명함으로 돌아가기"
+        >
+          명함으로 돌아가기
+        </button>
+      )}
     </div>
   )
 }

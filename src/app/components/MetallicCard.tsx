@@ -1,12 +1,24 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
 import styles from './MetallicCard.module.css'
 
-export default function MetallicCard() {
+type MetallicCardProps = {
+  enableGyro?: boolean
+  interactionSignal?: number
+}
+
+export default function MetallicCard({ enableGyro = false, interactionSignal = 0 }: MetallicCardProps) {
   const [copied, setCopied] = useState(false)
   const [emailLink, setEmailLink] = useState('mailto:rupital0815@gmail.com')
   const [isMobile, setIsMobile] = useState(false)
+  const [gyroActive, setGyroActive] = useState(false)
+  const [parallaxActive, setParallaxActive] = useState(false)
+  const [tilt, setTilt] = useState({ x: 0, y: 0 })
+  const targetTilt = useRef({ x: 0, y: 0 })
+  const animationFrame = useRef<number | null>(null)
+  const cardWrapperRef = useRef<HTMLDivElement>(null)
+  const tiltActive = gyroActive || parallaxActive
 
   useEffect(() => {
     const checkDevice = () => {
@@ -74,6 +86,104 @@ export default function MetallicCard() {
     return () => window.removeEventListener('resize', checkDevice)
   }, [])
 
+  const requestGyroPermission = useCallback(async () => {
+    if (!enableGyro || !isMobile || gyroActive) return
+
+    const orientationEvent = window.DeviceOrientationEvent as typeof DeviceOrientationEvent & {
+      requestPermission?: () => Promise<'granted' | 'denied' | 'default'>
+    }
+
+    if (typeof orientationEvent.requestPermission === 'function') {
+      try {
+        const permission = await orientationEvent.requestPermission()
+        if (permission === 'granted') {
+          setGyroActive(true)
+        }
+      } catch {
+        // 사용자가 거부하거나 지원하지 않는 환경
+      }
+      return
+    }
+
+    setGyroActive(true)
+  }, [enableGyro, gyroActive, isMobile])
+
+  useEffect(() => {
+    if (interactionSignal > 0) {
+      requestGyroPermission()
+    }
+  }, [interactionSignal, requestGyroPermission])
+
+  useEffect(() => {
+    if (enableGyro && !isMobile) {
+      setParallaxActive(true)
+    } else {
+      setParallaxActive(false)
+    }
+  }, [enableGyro, isMobile])
+
+  useEffect(() => {
+    if (!gyroActive) return
+
+    const handleOrientation = (event: DeviceOrientationEvent) => {
+      const gamma = event.gamma ?? 0
+      const beta = event.beta ?? 0
+      const maxTilt = 10
+
+      targetTilt.current = {
+        x: Math.max(-maxTilt, Math.min(maxTilt, gamma * 0.35)),
+        y: Math.max(-maxTilt, Math.min(maxTilt, (beta - 45) * 0.2)),
+      }
+    }
+
+    window.addEventListener('deviceorientation', handleOrientation, true)
+
+    return () => {
+      window.removeEventListener('deviceorientation', handleOrientation, true)
+    }
+  }, [gyroActive])
+
+  useEffect(() => {
+    if (!tiltActive) return
+
+    const animateTilt = () => {
+      setTilt((current) => ({
+        x: current.x + (targetTilt.current.x - current.x) * 0.12,
+        y: current.y + (targetTilt.current.y - current.y) * 0.12,
+      }))
+      animationFrame.current = requestAnimationFrame(animateTilt)
+    }
+
+    animationFrame.current = requestAnimationFrame(animateTilt)
+
+    return () => {
+      if (animationFrame.current !== null) {
+        cancelAnimationFrame(animationFrame.current)
+      }
+    }
+  }, [tiltActive])
+
+  const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
+    if (!parallaxActive) return
+
+    const rect = cardWrapperRef.current?.getBoundingClientRect()
+    if (!rect) return
+
+    const centerX = rect.left + rect.width / 2
+    const centerY = rect.top + rect.height / 2
+    const maxTilt = 10
+
+    targetTilt.current = {
+      x: Math.max(-maxTilt, Math.min(maxTilt, ((event.clientX - centerX) / (rect.width / 2)) * maxTilt * 0.45)),
+      y: Math.max(-maxTilt, Math.min(maxTilt, -((event.clientY - centerY) / (rect.height / 2)) * maxTilt * 0.45)),
+    }
+  }
+
+  const handleMouseLeave = () => {
+    if (!parallaxActive) return
+    targetTilt.current = { x: 0, y: 0 }
+  }
+
   const handleCopy = async (text: string) => {
     try {
       await navigator.clipboard.writeText(text)
@@ -87,9 +197,22 @@ export default function MetallicCard() {
   }
 
 
+  const cardTransform = tiltActive
+    ? `rotateX(${-tilt.y}deg) rotateY(${tilt.x}deg)`
+    : undefined
+
   return (
-    <div className={styles.cardWrapper}>
-      <div className={styles.card3D}>
+    <div
+      ref={cardWrapperRef}
+      className={styles.cardWrapper}
+      onTouchStart={requestGyroPermission}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+    >
+      <div
+        className={`${styles.card3D} ${tiltActive ? styles.gyroActive : ''}`}
+        style={cardTransform ? { transform: cardTransform } : undefined}
+      >
         <div className={styles.cardFront}>
           <div className={styles.cardContent}>
             <div className={styles.logo}>Rupital0815</div>

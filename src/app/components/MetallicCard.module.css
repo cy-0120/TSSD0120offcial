@@ -20,6 +20,20 @@
   overflow: visible;
   border-radius: 20px;
   box-sizing: border-box;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.card3D.gyroActive {
+  transition: transform 0.08s ease-out;
+}
+
+.card3D.gyroActive .cardFront {
+  animation: none;
+}
+
+.card3D.gyroActive .cardFront:hover {
+  transform: none;
 }
 
 .cardFront {

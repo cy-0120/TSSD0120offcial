@@ -24,6 +24,118 @@
   display: none;
 }
 
+.cardOnlyMode {
+  overflow: hidden;
+  height: 100vh;
+  min-height: 100vh;
+}
+
+.profileSection {
+  position: relative;
+  width: 100%;
+}
+
+.profileSectionCardOnly {
+  min-height: 100vh;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.profileSectionRevealed {
+  min-height: auto;
+  height: auto;
+}
+
+.tapHint {
+  position: absolute;
+  bottom: calc(2rem + env(safe-area-inset-bottom, 0));
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 0;
+  padding: 0.6rem 1rem;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.55);
+  text-align: center;
+  max-width: calc(100% - 2rem);
+  pointer-events: none;
+  animation: tapHintPulse 2s ease-in-out infinite;
+}
+
+@keyframes tapHintPulse {
+  0%, 100% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 0.85;
+  }
+}
+
+.contentVisible {
+  animation: contentReveal 0.6s ease forwards;
+  padding-bottom: calc(5rem + env(safe-area-inset-bottom, 0));
+}
+
+@keyframes contentReveal {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.backToCardButton {
+  position: fixed;
+  left: 50%;
+  bottom: calc(1.25rem + env(safe-area-inset-bottom, 0));
+  transform: translateX(-50%);
+  z-index: 900;
+  padding: 0.75rem 1.25rem;
+  border: 1px solid rgba(102, 126, 234, 0.45);
+  border-radius: 999px;
+  background: rgba(20, 20, 20, 0.88);
+  color: #ffffff;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45), 0 0 20px rgba(102, 126, 234, 0.25);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.backToCardButton:active {
+  transform: translateX(-50%) scale(0.97);
+  background: rgba(102, 126, 234, 0.25);
+}
+
+/* 카드 페이드아웃 */
+.profileSectionFading {
+  min-height: 100vh;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none;
+  animation: cardFadeOut 0.6s ease forwards;
+}
+
+@keyframes cardFadeOut {
+  from {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.92) translateY(-24px);
+  }
+}
 /* 햄버거 메뉴 */
 .menuContainer {
   position: fixed;
