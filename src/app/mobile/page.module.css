@@ -559,6 +559,11 @@
   text-shadow: 0 0 8px rgba(102, 126, 234, 0.8);
 }
 
+.projectStatusInactive {
+  background-color: #ef4444 !important;
+  text-shadow: 0 0 8px rgba(239, 68, 68, 0.8) !important;
+}
+
 .activityBar {
   width: 100%;
   height: 6px;

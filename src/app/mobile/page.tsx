@@ -245,16 +245,9 @@ const handleBackToCard = () => {
             </div>
             <div className={styles.projectCard}>
               <div className={styles.projectHeader}>
-                <a 
-                  href="https://ade.dksh.site" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className={styles.projectTitleLink}
-                >
-                  <h3 className={styles.projectTitle}>ADE</h3>
-                </a>
+                <h3 className={styles.projectTitle}>ADE</h3>
                 <div className={styles.statusContainer}>
-                  <span className={styles.projectStatus}>활성</span>
+                  <span className={`${styles.projectStatus} ${styles.projectStatusInactive}`}>비활성</span>
                   <span className={styles.completionLabel}>완성도</span>
                   <div className={styles.activityBar}>
                     <div 
@@ -273,6 +266,39 @@ const handleBackToCard = () => {
                 <span className={styles.techTag}>HTML</span>
                 <span className={styles.techTag}>CSS</span>
                 <span className={styles.techTag}>반응형 CSS 프레임워크</span>
+              </div>
+            </div>
+            <div className={styles.projectCard}>
+              <div className={styles.projectHeader}>
+                <a 
+                  href="https://gsr.kro.kr/" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className={styles.projectTitleLink}
+                >
+                  <h3 className={styles.projectTitle}>GSR</h3>
+                </a>
+                <div className={styles.statusContainer}>
+                  <span className={styles.projectStatus}>활성</span>
+                  <span className={styles.completionLabel}>완성도</span>
+                  <div className={styles.activityBar}>
+                    <div 
+                      className={`${styles.activityFill} ${getCompletionColorClass(100)}`} 
+                      style={{ width: '100%' }}
+                    ></div>
+                  </div>
+                </div>
+              </div>
+              <p className={styles.projectDescription}>
+                지도 위에서 위험 요소와 혼잡도를 제보하고 확인할 수 있는 지역 안전 지도입니다.
+                AI가 제보 내용을 분석해 위험도를 배정합니다.
+              </p>
+              <div className={styles.projectTech}>
+                <span className={styles.techTag}>Express</span>
+                <span className={styles.techTag}>Node.js</span>
+                <span className={styles.techTag}>Leaflet</span>
+                <span className={styles.techTag}>Unpkg</span>
+                <span className={styles.techTag}>Vercel</span>
               </div>
             </div>
             <div className={styles.projectCard}>
