@@ -247,7 +247,7 @@ export default function MetallicCard({ enableGyro = false, interactionSignal = 0
               </div>
               <div className={styles.infoItem}>
                 <span className={styles.infoLabel}>Major:</span>
-                <span className={styles.infoValue}>Web & Security</span>
+                <span className={styles.infoValue}>Web & Service</span>
               </div>
             </div>
           </div>

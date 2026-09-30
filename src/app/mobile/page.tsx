@@ -193,13 +193,13 @@ const handleBackToCard = () => {
             <p className={styles.description}>
               안녕하세요! 저는 Rupital0815입니다.
               <br />
-              프론트엔드와 보안 전문가를 목표를 하고 있습니다.
+              풀스택 개발자를 목표를 하고 있습니다.
               <br />
               웹의 구성, 디자인, 보안에 관심이 많으며 많은 사용자의 편리를 우선시 하는 개발을 추구합니다.
             </p>
             <div className={styles.stats}>
               <div className={styles.statItem}>
-                <div className={styles.statNumber}>18세</div>
+                <div className={styles.statNumber}>19세</div>
                 <div className={styles.statLabel}>고등학생</div>
               </div>
               <div className={styles.statItem}>
@@ -207,7 +207,7 @@ const handleBackToCard = () => {
                 <div className={styles.statLabel}>직업</div>
               </div>
               <div className={styles.statItem}>
-                <div className={styles.statNumber}>1년</div>
+                <div className={styles.statNumber}>3년</div>
                 <div className={styles.statLabel}>개발 경험</div>
               </div>
             </div>
@@ -279,7 +279,7 @@ const handleBackToCard = () => {
               <div className={styles.projectHeader}>
                 <h3 className={styles.projectTitle}>genshin illust</h3>
                 <div className={styles.statusContainer}>
-                  <span className={styles.projectStatus}>활성</span>
+                  <span className={styles.projectStatus}>비활성</span>
                   <span className={styles.completionLabel}>완성도</span>
                   <div className={styles.activityBar}>
                     <div 
@@ -337,7 +337,7 @@ const handleBackToCard = () => {
           <div className={styles.colleaguesList}>
             <div className={styles.colleagueCard}>
               <a 
-                href="https://misty6760.kro.kr" 
+                href="https://zyntax.kro.kr/" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className={styles.colleagueNameLink}
